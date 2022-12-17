@@ -1,0 +1,45 @@
+name: build binaries
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      
+      - name: Get dependencies
+        run: go get -u .
+
+      - name: Build Linux-amd64
+        run: go build -trimpath -o x86-64_linux_bar-craft .
+        env:
+          GOOS: linux
+          GOARCH: amd64
+
+      - name: Build Linux-arm64
+        run: go build -trimpath -o arm-64_linux_bar-craft .
+        env:
+          GOOS: linux
+          GOARCH: arm64
+
+      - name: Upload Linux-amd64
+        uses: actions/upload-artifact@v3
+        with:
+          name: x86-64_linux_bar-craft
+          path: x86-64_linux_bar-craft
+
+      - name: Upload Linux-arm64
+        uses: actions/upload-artifact@v3
+        with:
+          name: arm-64_linux_bar-craft
+          path: arm-64_linux_bar-craft
